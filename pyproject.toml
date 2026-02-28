@@ -1,0 +1,115 @@
+[project]
+name = "chelyzer"
+version = "0.1.0"
+description = "A project to analyze your chess history"
+readme = "README.md"
+authors = [{ name = "Moritz Eckert", email = "MoritzEckert@web.de" }]
+license = { text = "MIT" }
+keywords = ["chess", "tournament"]
+dependencies = [
+    "pydantic>=2.11.9",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Games/Entertainment :: Board Games"
+]
+
+[project.urls]
+Homepage = "https://github.com/Moritz72/chelyzer"
+Repository = "https://github.com/Moritz72/chelyzer"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.2",
+    "mypy>=1.0",
+    "ruff>=0.14",
+    "black>=24.0"
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["chelyzer_rating"]
+package-dir = {"" = "src"}
+
+[tool.mypy]
+files = ["src/chelyzer_rating", "tests"]
+strict = true
+
+[[tool.mypy.overrides]]
+module = "pytest"
+ignore_missing_imports = true
+
+[tool.ruff]
+src = ["src/chelyzer_rating", "tests"]
+target-version = "py311"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+known-first-party = ["chelyzer_rating"]
+
+[tool.ruff.lint]
+fixable = ["ALL"]
+unfixable = []
+select = [
+  "E",    # pycodestyle (errors)
+  "W",    # pycodestyle warnings (e.g., whitespace)
+  "F",    # pyflakes
+  "I",    # isort
+  "B",    # flake8-bugbear
+  "UP",   # pyupgrade
+  "C4",   # flake8-comprehensions
+  "N",    # pep8-naming
+  "S",    # flake8-bandit (security)
+  "TCH",  # flake8-type-checking
+  "TID",  # tidy imports
+  "PL",   # pylint-like rules
+  "D",    # pydocstyle (docstring conventions)
+  "Q",    # flake8-quotes (consistent quotes)
+  "SIM",  # flake8-simplify (simpler conditionals)
+  "RET",  # flake8-return (consistent, explicit returns)
+  "PERF", # perflint (obvious performance footguns)
+  "RUF",  # Ruff-native rules (modern Python best practices)
+  "ANN",  # type annotation enforcement
+  "EM",   # exception message style
+]
+ignore = [
+  "D100",  # module docstring
+  "D104",  # package docstring
+  "D203",  # blank line before class
+  "D212",  # multi line summary first line
+  "E501",  # line length
+  "S310",  # URL open scheme audit
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = ["S101"]
+
+[tool.black]
+line-length = 120
+target-version = ['py311']
+skip-string-normalization = false
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''

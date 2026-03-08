@@ -7,7 +7,13 @@ authors = [{ name = "Moritz Eckert", email = "MoritzEckert@web.de" }]
 license = { text = "MIT" }
 keywords = ["chess", "tournament"]
 dependencies = [
+    "chess>=1.11.2",
+    "fastapi>=0.135.1",
     "pydantic>=2.11.9",
+    "python-dotenv>=1.2",
+    "requests>=2.32.5",
+    "sqlmodel>=0.0.37",
+    "uvicorn>=0.41.0",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -26,7 +32,9 @@ dev = [
     "pytest>=7.2",
     "mypy>=1.0",
     "ruff>=0.14",
-    "black>=24.0"
+    "black>=24.0",
+    "httpx>=0.28.1",
+    "types-requests>=2.32.4.20260107",
 ]
 
 [build-system]
@@ -34,11 +42,11 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["chelyzer_rating"]
+packages = ["chelyzer_rating", "chelyzer_lichess", "chelyzer_api"]
 package-dir = {"" = "src"}
 
 [tool.mypy]
-files = ["src/chelyzer_rating", "tests"]
+files = ["src", "tests"]
 strict = true
 
 [[tool.mypy.overrides]]
@@ -46,7 +54,7 @@ module = "pytest"
 ignore_missing_imports = true
 
 [tool.ruff]
-src = ["src/chelyzer_rating", "tests"]
+src = ["src", "tests"]
 target-version = "py311"
 
 [tool.ruff.format]
@@ -56,7 +64,7 @@ line-ending = "lf"
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
-known-first-party = ["chelyzer_rating"]
+known-first-party = ["chelyzer_rating", "chelyzer_lichess", "chelyzer_api"]
 
 [tool.ruff.lint]
 fixable = ["ALL"]

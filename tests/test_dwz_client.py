@@ -1,12 +1,22 @@
+import os
 from datetime import date
 
+import pytest
+
 from chelyzer_rating import DwzClient
+from chelyzer_rating.dwz.models import DsbCredentials
 
 
+@pytest.mark.skipif(os.getenv("CI") == "true", reason="Skip on CI")
 def test_get_rating() -> None:
-    """Test retrieval of rating at various dates."""
-    client = DwzClient()
-    player_name = "Moritz Eckert"
+    """Test retrieval of ratings at various dates."""
+    username = os.getenv("DSB_USERNAME", "")
+    password = os.getenv("DSB_PASSWORD", "")
+
+    credentials = DsbCredentials(username=username, password=password)
+    client = DwzClient(credentials=credentials)
+
+    player_name = "Eckert, Moritz"
     year_to_rating = {
         2017: None,
         2018: None,

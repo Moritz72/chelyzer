@@ -35,5 +35,16 @@ jobs:
       - name: Type check with Mypy
         run: mypy
 
+      - name: Create .env file
+        run: |
+          cat << EOF > .env
+          LICHESS_API_TOKEN=${{ secrets.LICHESS_API_TOKEN }}
+          LICHESS_USERNAME=${{ secrets.LICHESS_USERNAME }}
+          DSB_USERNAME=${{ secrets.DSB_USERNAME }}
+          DSB_PASSWORD=${{ secrets.DSB_PASSWORD }}
+          PLAYER_NAME=${{ secrets.PLAYER_NAME }}
+          RATING_CLIENT=${{ secrets.RATING_CLIENT }}
+          EOF
+
       - name: Run tests
         run: pytest

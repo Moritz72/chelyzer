@@ -1,37 +1,42 @@
 from datetime import date
 
+from sqlmodel import desc, select
+
 from chelyzer_rating.base import BaseRatingClient
-from chelyzer_rating.dwz.player_cache import PlayerCache
-from chelyzer_rating.dwz.player_reader import PlayerReader
+from chelyzer_rating.database_manager import database_manager
+from chelyzer_rating.dwz.dsb_http_client import DsbHttpClient
+from chelyzer_rating.dwz.models import DsbCredentials, PlayerDwz
+from chelyzer_rating.dwz.table_manager import TableManager
 
 
 class DwzClient(BaseRatingClient):
     """Rating client for DWZ."""
 
-    def __init__(self) -> None:
-        """Initialize a new client."""
-        self._player_cache: PlayerCache = PlayerCache()
+    def __init__(self, *, credentials: DsbCredentials | None = None) -> None:
+        """Initialize the client."""
+        database_manager.create_tables()
 
-    def get_id(self, player_name: str) -> int:
-        """Return the ID of the player with the given name."""
-        return self._player_cache.get_id(player_name)
+        if credentials is None:
+            return
 
-    def get_name(self, player_id: int) -> str:
-        """Return the name of the player with the given ID."""
-        return self._player_cache.get_name(player_id)
+        client = DsbHttpClient(credentials)
+        table_manager = TableManager(client)
 
-    def get_rating_by_id(self, player_id: int, rating_date: date) -> int | None:
-        """Return the rating of the player with the given ID at the given date."""
-        _, tournaments = PlayerReader.get_player_data(player_id)
+        with database_manager.get_session() as session:
+            table_manager.update(session)
 
-        most_recent = next(
-            (tournament for tournament in reversed(tournaments) if tournament.end_date <= rating_date), None
-        )
+    def get_rating_by_name(self, player_name: str, list_date: date) -> int | None:
+        """Return the rating of the player with the given name at the given date."""
+        player_name = player_name.replace(", ", ",")
 
-        if most_recent is None:
-            return None
-        dwz_string = most_recent.dwzneu
+        with database_manager.get_session() as session:
+            query = (
+                select(PlayerDwz.dwz)
+                .where(PlayerDwz.name == player_name)
+                .where(PlayerDwz.list_date <= list_date)
+                .order_by(desc(PlayerDwz.list_date))
+                .limit(1)
+            )
 
-        if dwz_string:
-            return int(dwz_string)
-        return None
+            dwz = session.exec(query).first()
+            return dwz if dwz else None
